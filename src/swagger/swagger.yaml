@@ -1,0 +1,98 @@
+openapi: 3.0.3
+info:
+  title: Event Booking API
+  version: 1.0.0
+
+paths:
+  /events:
+    get:
+      summary: List upcoming events
+      responses:
+        '200':
+          description: Array of events
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/Event' }
+    post:
+      summary: Create event
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateEvent' }
+      responses:
+        '201': { description: Created }
+        '422': { description: Validation error }
+
+  /bookings:
+    post:
+      summary: Book a ticket
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:  { type: integer }
+                eventId: { type: integer }
+      responses:
+        '201':
+          description: Booking confirmed with unique code
+        '409':
+          description: No tickets available
+
+  /users/{id}/bookings:
+    get:
+      summary: Get bookings for a user
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200': { description: List of user bookings }
+
+  /events/{id}/attendance:
+    post:
+      summary: Record attendance via booking code
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code: { type: string, example: "EVT-A3F90C2B" }
+      responses:
+        '200': { description: Entry recorded with ticket count }
+        '404': { description: Code not found }
+
+components:
+  schemas:
+    Event:
+      type: object
+      properties:
+        id:                { type: integer }
+        title:             { type: string }
+        date:              { type: string, format: date-time }
+        total_capacity:    { type: integer }
+        remaining_tickets: { type: integer }
+    CreateEvent:
+      type: object
+      required: [title, date, capacity]
+      properties:
+        title:    { type: string }
+        date:     { type: string, format: date-time }
+        capacity: { type: integer, minimum: 1 }
