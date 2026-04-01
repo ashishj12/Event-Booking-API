@@ -1,0 +1,902 @@
+{
+  "info": {
+    "_postman_id": "3aac5612-c14f-4efd-a9b0-d5cff9ceed83",
+    "name": "Event Booking System",
+    "description": "Complete API collection for the Mini Event Management System. Set the `baseUrl` environment variable to `http://localhost:5000/api/v1` before running.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "34118587"
+  },
+  "item": [
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Create User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const json = pm.response.json();",
+                  "  pm.collectionVariables.set('userId', json.data.id);",
+                  "  pm.test('User created successfully', () => {",
+                  "    pm.expect(json.success).to.be.true;",
+                  "    pm.expect(json.data).to.have.property('id');",
+                  "    pm.expect(json.data).to.have.property('email');",
+                  "  });",
+                  "}",
+                  "pm.test('Status is 201', () => pm.response.to.have.status(201));"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"test.user@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["users"]
+            },
+            "description": "Creates a new user. Auto-saves the returned userId to collection variable."
+          },
+          "response": [
+            {
+              "name": "201 - User Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"test.user@example.com\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/users",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["users"]
+                },
+                "description": "Creates a new user. Auto-saves the returned userId to collection variable."
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": 1,\n    \"name\": \"Rahul Sharma\",\n    \"email\": \"rahul.sharma@example.com\"\n  }\n}"
+            },
+            {
+              "name": "409 - Email Already Registered",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"test.user@example.com\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/users",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["users"]
+                },
+                "description": "Creates a new user. Auto-saves the returned userId to collection variable."
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": \"Email already registered\"\n}"
+            },
+            {
+              "name": "422 - Validation Error",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"test.user@example.com\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/users",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["users"]
+                },
+                "description": "Creates a new user. Auto-saves the returned userId to collection variable."
+              },
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"errors\": [\n    { \"field\": \"body.email\", \"message\": \"valid email is required\" }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get User Bookings",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Returns bookings array', () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.success).to.be.true;",
+                  "  pm.expect(json.data).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/{{userId}}/bookings",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "{{userId}}", "bookings"]
+            },
+            "description": "Retrieves all bookings made by a specific user including event details."
+          },
+          "response": [
+            {
+              "name": "200 - User Bookings",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/users/{{userId}}/bookings",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["users", "{{userId}}", "bookings"]
+                },
+                "description": "Retrieves all bookings made by a specific user including event details."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": 1,\n      \"code\": \"EVT-A3F90C2B\",\n      \"booking_date\": \"2025-04-01T10:30:00.000Z\",\n      \"title\": \"Node.js Workshop\",\n      \"description\": \"Advanced Node.js patterns\",\n      \"date\": \"2025-05-15T09:00:00.000Z\",\n      \"total_capacity\": 100,\n      \"remaining_tickets\": 87\n    }\n  ]\n}"
+            },
+            {
+              "name": "404 - User Not Found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/users/{{userId}}/bookings",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["users", "{{userId}}", "bookings"]
+                },
+                "description": "Retrieves all bookings made by a specific user including event details."
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": \"User not found\"\n}"
+            },
+            {
+              "name": "422 - Invalid User ID",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/users/{{userId}}/bookings",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["users", "{{userId}}", "bookings"]
+                },
+                "description": "Retrieves all bookings made by a specific user including event details."
+              },
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"errors\": [\n    { \"field\": \"params.id\", \"message\": \"user id must be a positive integer\" }\n  ]\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Events",
+      "item": [
+        {
+          "name": "Create Event",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const json = pm.response.json();",
+                  "  pm.collectionVariables.set('eventId', json.data.id);",
+                  "  pm.test('Event created successfully', () => {",
+                  "    pm.expect(json.success).to.be.true;",
+                  "    pm.expect(json.data).to.have.property('id');",
+                  "    pm.expect(json.data.remaining_tickets).to.equal(json.data.total_capacity);",
+                  "  });",
+                  "}",
+                  "pm.test('Status is 201', () => pm.response.to.have.status(201));"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Node.js Workshop\",\n  \"description\": \"Advanced Node.js patterns and best practices\",\n  \"date\": \"2026-04-01T10:00:00Z\",\n  \"capacity\": 100\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/events",
+              "host": ["{{baseUrl}}"],
+              "path": ["events"]
+            },
+            "description": "Creates a new event. remaining_tickets is automatically set equal to capacity. Auto-saves eventId to collection variable."
+          },
+          "response": [
+            {
+              "name": "201 - Event Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Node.js Workshop\",\n  \"description\": \"Advanced Node.js patterns and best practices\",\n  \"date\": \"2026-04-01T10:00:00Z\",\n  \"capacity\": 100\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/events",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["events"]
+                },
+                "description": "Creates a new event. remaining_tickets is automatically set equal to capacity. Auto-saves eventId to collection variable."
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": 1,\n    \"title\": \"Node.js Workshop\",\n    \"description\": \"Advanced Node.js patterns and best practices\",\n    \"date\": \"2025-05-15T09:00:00.000Z\",\n    \"total_capacity\": 100,\n    \"remaining_tickets\": 100\n  }\n}"
+            },
+            {
+              "name": "422 - Validation Error",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Node.js Workshop\",\n  \"description\": \"Advanced Node.js patterns and best practices\",\n  \"date\": \"2026-04-01T10:00:00Z\",\n  \"capacity\": 100\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/events",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["events"]
+                },
+                "description": "Creates a new event. remaining_tickets is automatically set equal to capacity. Auto-saves eventId to collection variable."
+              },
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"errors\": [\n    { \"field\": \"body.date\", \"message\": \"date must be ISO8601 datetime\" },\n    { \"field\": \"body.capacity\", \"message\": \"capacity must be a positive integer\" }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "List Upcoming Events",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Returns events array', () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.success).to.be.true;",
+                  "  pm.expect(json.data).to.be.an('array');",
+                  "});",
+                  "pm.test('All events are upcoming', () => {",
+                  "  const json = pm.response.json();",
+                  "  const now = new Date();",
+                  "  json.data.forEach(e => {",
+                  "    pm.expect(new Date(e.date)).to.be.above(now);",
+                  "  });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/events",
+              "host": ["{{baseUrl}}"],
+              "path": ["events"]
+            },
+            "description": "Returns all upcoming events (date > NOW()) ordered by date ascending."
+          },
+          "response": [
+            {
+              "name": "200 - Upcoming Events",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/events",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["events"]
+                },
+                "description": "Returns all upcoming events (date > NOW()) ordered by date ascending."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": 1,\n      \"title\": \"Node.js Workshop\",\n      \"description\": \"Advanced Node.js patterns and best practices\",\n      \"date\": \"2025-05-15T09:00:00.000Z\",\n      \"total_capacity\": 100,\n      \"remaining_tickets\": 87\n    },\n    {\n      \"id\": 2,\n      \"title\": \"React Conf 2025\",\n      \"description\": null,\n      \"date\": \"2025-06-20T10:00:00.000Z\",\n      \"total_capacity\": 200,\n      \"remaining_tickets\": 200\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Record Attendance",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Returns ticket count', () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.success).to.be.true;",
+                  "  pm.expect(json.data).to.have.property('ticketsBooked');",
+                  "  pm.expect(json.data).to.have.property('message');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"{{bookingCode}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/events/{{eventId}}/attendance",
+              "host": ["{{baseUrl}}"],
+              "path": ["events", "{{eventId}}", "attendance"]
+            },
+            "description": "Records attendance for an event using the unique booking code. Returns how many tickets the user booked for this event."
+          },
+          "response": [
+            {
+              "name": "200 - Check-in Successful",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"code\": \"{{bookingCode}}\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/events/{{eventId}}/attendance",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["events", "{{eventId}}", "attendance"]
+                },
+                "description": "Records attendance for an event using the unique booking code. Returns how many tickets the user booked for this event."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"message\": \"Check-in successful\",\n    \"userId\": 1,\n    \"ticketsBooked\": 1\n  }\n}"
+            },
+            {
+              "name": "404 - Invalid Code",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"code\": \"{{bookingCode}}\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/events/{{eventId}}/attendance",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["events", "{{eventId}}", "attendance"]
+                },
+                "description": "Records attendance for an event using the unique booking code. Returns how many tickets the user booked for this event."
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": \"Invalid code or wrong event\"\n}"
+            },
+            {
+              "name": "409 - Already Checked In",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"code\": \"{{bookingCode}}\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/events/{{eventId}}/attendance",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["events", "{{eventId}}", "attendance"]
+                },
+                "description": "Records attendance for an event using the unique booking code. Returns how many tickets the user booked for this event."
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": \"Already checked in\"\n}"
+            },
+            {
+              "name": "422 - Validation Error",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"code\": \"{{bookingCode}}\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/events/{{eventId}}/attendance",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["events", "{{eventId}}", "attendance"]
+                },
+                "description": "Records attendance for an event using the unique booking code. Returns how many tickets the user booked for this event."
+              },
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"errors\": [\n    { \"field\": \"body.code\", \"message\": \"code is required\" }\n  ]\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Bookings",
+      "item": [
+        {
+          "name": "Book a Ticket",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const json = pm.response.json();",
+                  "  pm.collectionVariables.set('bookingCode', json.data.code);",
+                  "  pm.test('Booking created with code', () => {",
+                  "    pm.expect(json.success).to.be.true;",
+                  "    pm.expect(json.data).to.have.property('code');",
+                  "    pm.expect(json.data).to.have.property('bookingId');",
+                  "    pm.expect(json.data.code).to.match(/^EVT-/);",
+                  "  });",
+                  "}",
+                  "pm.test('Status is 201', () => pm.response.to.have.status(201));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": {{userId}},\n  \"eventId\": {{eventId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/bookings",
+              "host": ["{{baseUrl}}"],
+              "path": ["bookings"]
+            },
+            "description": "Books a ticket for a user. Checks ticket availability inside a MySQL transaction with FOR UPDATE lock. Returns a unique booking code. Auto-saves the code to bookingCode variable for use in the attendance request."
+          },
+          "response": [
+            {
+              "name": "201 - Booking Confirmed",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"userId\": {{userId}},\n  \"eventId\": {{eventId}}\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/bookings",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["bookings"]
+                },
+                "description": "Books a ticket for a user. Checks ticket availability inside a MySQL transaction with FOR UPDATE lock. Returns a unique booking code. Auto-saves the code to bookingCode variable for use in the attendance request."
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"bookingId\": 1,\n    \"userId\": 1,\n    \"eventId\": 1,\n    \"code\": \"EVT-A3F90C2B\"\n  }\n}"
+            },
+            {
+              "name": "409 - No Tickets Available",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"userId\": {{userId}},\n  \"eventId\": {{eventId}}\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/bookings",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["bookings"]
+                },
+                "description": "Books a ticket for a user. Checks ticket availability inside a MySQL transaction with FOR UPDATE lock. Returns a unique booking code. Auto-saves the code to bookingCode variable for use in the attendance request."
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": \"No tickets available\"\n}"
+            },
+            {
+              "name": "409 - Already Booked",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"userId\": {{userId}},\n  \"eventId\": {{eventId}}\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/bookings",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["bookings"]
+                },
+                "description": "Books a ticket for a user. Checks ticket availability inside a MySQL transaction with FOR UPDATE lock. Returns a unique booking code. Auto-saves the code to bookingCode variable for use in the attendance request."
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": \"User already booked this event\"\n}"
+            },
+            {
+              "name": "404 - User Not Found",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"userId\": {{userId}},\n  \"eventId\": {{eventId}}\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/bookings",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["bookings"]
+                },
+                "description": "Books a ticket for a user. Checks ticket availability inside a MySQL transaction with FOR UPDATE lock. Returns a unique booking code. Auto-saves the code to bookingCode variable for use in the attendance request."
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": \"User not found\"\n}"
+            },
+            {
+              "name": "404 - Event Not Found",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"userId\": {{userId}},\n  \"eventId\": {{eventId}}\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/bookings",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["bookings"]
+                },
+                "description": "Books a ticket for a user. Checks ticket availability inside a MySQL transaction with FOR UPDATE lock. Returns a unique booking code. Auto-saves the code to bookingCode variable for use in the attendance request."
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": \"Event not found\"\n}"
+            },
+            {
+              "name": "422 - Validation Error",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"userId\": {{userId}},\n  \"eventId\": {{eventId}}\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/bookings",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["bookings"]
+                },
+                "description": "Books a ticket for a user. Checks ticket availability inside a MySQL transaction with FOR UPDATE lock. Returns a unique booking code. Auto-saves the code to bookingCode variable for use in the attendance request."
+              },
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"errors\": [\n    { \"field\": \"body.userId\", \"message\": \"userId must be a positive integer\" },\n    { \"field\": \"body.eventId\", \"message\": \"eventId must be a positive integer\" }\n  ]\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [""]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [""]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api/v1"
+    },
+    {
+      "key": "userId",
+      "value": "1"
+    },
+    {
+      "key": "eventId",
+      "value": "1"
+    },
+    {
+      "key": "bookingCode",
+      "value": ""
+    }
+  ]
+}

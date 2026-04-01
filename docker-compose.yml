@@ -11,29 +11,24 @@ services:
       MYSQL_USER: appuser
       MYSQL_PASSWORD: apppassword
     ports:
-      - "3306:3306"
+      - "3307:3307"
     volumes:
       - db_data:/var/lib/mysql
-      - ./src/schema:/docker-entrypoint-initdb.d  # initialize DB with schema.sql
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-u", "root", "-prootpassword"]
-      interval: 10s
-      retries: 5
-      start_period: 10s
+      - ./src/schema:/docker-entrypoint-initdb.d
 
   app:
     build:
       context: .
-      dockerfile: ./src/Dockerfile
+      dockerfile: src/Dockerfile 
     container_name: event_booking_app
     restart: unless-stopped
     env_file:
-      - .env  # loads DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT, PORT
+      - .env
     ports:
       - "5000:5000"
     depends_on:
-      db:
-        condition: service_healthy
+      - db
+    command: ["node", "src/server.js"]   # optional override
 
 volumes:
   db_data:
