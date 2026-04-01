@@ -1,7 +1,5 @@
-
 export const validate = (schema) => {
   return (req, res, next) => {
-    // Gather all parts of request that might be validated
     const dataToValidate = {
       body: req.body,
       params: req.params,
@@ -16,12 +14,9 @@ export const validate = (schema) => {
         errors: result.error.errors,
       });
     }
-
-    // Overwrite req objects with parsed/sanitized data
     if (result.data.body) req.body = result.data.body;
     if (result.data.params) req.params = result.data.params;
     if (result.data.query) req.query = result.data.query;
-
     next();
   };
 };

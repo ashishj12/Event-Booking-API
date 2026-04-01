@@ -1,7 +1,4 @@
-CREATE DATABASE IF NOT EXISTS event_booking_api;
-USE event_booking_api;
-
---Users Table
+-- Users Table
 CREATE TABLE IF NOT EXISTS users(
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -41,8 +38,3 @@ CREATE TABLE IF NOT EXISTS event_attendance (
   CONSTRAINT fk_attendance_user  FOREIGN KEY (user_id)  REFERENCES users(id)  ON DELETE CASCADE,
   CONSTRAINT fk_attendance_event FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE
 );
-
-
-
-
-

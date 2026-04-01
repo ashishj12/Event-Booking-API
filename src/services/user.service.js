@@ -3,7 +3,7 @@ import { AppError } from '../middlewares/errorHandler.js';
 
 export const getUserBookings = async (userId) => {
   const [bookings] = await pool.query(
-    `SELECT b.id, b.code, b.booking_date,
+    `SELECT b.id, b.booking_code AS code, b.booking_date,
             e.title, e.description, e.date,
             e.total_capacity, e.remaining_tickets
      FROM bookings b

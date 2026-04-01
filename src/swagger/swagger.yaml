@@ -1,98 +1,436 @@
 openapi: 3.0.3
 info:
   title: Event Booking API
+  description: API for managing users, events, bookings, and attendance
   version: 1.0.0
 
+servers:
+  - url: http://localhost:5000/api/v1
+    description: Local development server
+
+components:
+  parameters:
+    userId:
+      name: id
+      in: path
+      required: true
+      description: ID of the user
+      schema:
+        type: integer
+        minimum: 1
+    eventId:
+      name: id
+      in: path
+      required: true
+      description: ID of the event
+      schema:
+        type: integer
+        minimum: 1
+    bookingCode:
+      name: code
+      in: path
+      required: true
+      description: Booking code
+      schema:
+        type: string
+        example: EVT-1A2B3C4D
+
+  responses:
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              error:
+                type: string
+                example: Resource not found
+    Conflict:
+      description: Conflict error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              error:
+                type: string
+                example: Resource conflict
+    ValidationError:
+      description: Request validation failed
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              errors:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    path:
+                      type: array
+                      items:
+                        type: string
+                    message:
+                      type: string
+
+  schemas:
+    UserInput:
+      type: object
+      required:
+        - name
+        - email
+      properties:
+        name:
+          type: string
+          example: John Doe
+        email:
+          type: string
+          format: email
+          example: john@example.com
+
+    UserResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 1
+            name:
+              type: string
+              example: John Doe
+            email:
+              type: string
+              example: john@example.com
+
+    UserBookingsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              code:
+                type: string
+              booking_date:
+                type: string
+                format: date-time
+              title:
+                type: string
+              description:
+                type: string
+              date:
+                type: string
+                format: date-time
+              total_capacity:
+                type: integer
+              remaining_tickets:
+                type: integer
+
+    EventInput:
+      type: object
+      required:
+        - title
+        - date
+        - capacity
+      properties:
+        title:
+          type: string
+          example: Music Concert
+        description:
+          type: string
+          example: Live concert by famous band
+        date:
+          type: string
+          format: date-time
+          example: 2026-06-01T19:00:00Z
+        capacity:
+          type: integer
+          example: 100
+
+    EventResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            id:
+              type: integer
+            title:
+              type: string
+            description:
+              type: string
+            date:
+              type: string
+              format: date-time
+            total_capacity:
+              type: integer
+            remaining_tickets:
+              type: integer
+
+    EventsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/EventResponse'
+
+    AttendanceInput:
+      type: object
+      required:
+        - code
+      properties:
+        code:
+          type: string
+          example: EVT-1A2B3C4D
+
+    AttendanceResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            attendanceId:
+              type: integer
+            userId:
+              type: integer
+            eventId:
+              type: integer
+
+    BookingInput:
+      type: object
+      required:
+        - userId
+        - eventId
+      properties:
+        userId:
+          type: integer
+          example: 1
+        eventId:
+          type: integer
+          example: 2
+
+    BookingResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            bookingId:
+              type: integer
+            userId:
+              type: integer
+            eventId:
+              type: integer
+            code:
+              type: string
+              example: EVT-1A2B3C4D
+
+    BookingByCodeResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            id:
+              type: integer
+            code:
+              type: string
+            booking_date:
+              type: string
+              format: date-time
+            userId:
+              type: integer
+            name:
+              type: string
+            email:
+              type: string
+            eventId:
+              type: integer
+            title:
+              type: string
+            date:
+              type: string
+              format: date-time
+
 paths:
-  /events:
-    get:
-      summary: List upcoming events
+  /users:
+    post:
+      summary: Create a new user
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserInput'
       responses:
-        '200':
-          description: Array of events
+        '201':
+          description: User created successfully
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success: { type: boolean }
-                  data:
-                    type: array
-                    items: { $ref: '#/components/schemas/Event' }
-    post:
-      summary: Create event
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: { $ref: '#/components/schemas/CreateEvent' }
-      responses:
-        '201': { description: Created }
-        '422': { description: Validation error }
-
-  /bookings:
-    post:
-      summary: Book a ticket
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                userId: { type: integer }
-                eventId: { type: integer }
-      responses:
-        '201':
-          description: Booking confirmed with unique code
+                $ref: '#/components/schemas/UserResponse'
         '409':
-          description: No tickets available
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/ValidationError'
 
   /users/{id}/bookings:
     get:
-      summary: Get bookings for a user
+      summary: Get all bookings for a user
+      tags:
+        - Users
       parameters:
-        - in: path
-          name: id
-          required: true
-          schema: { type: integer }
+        - $ref: '#/components/parameters/userId'
       responses:
-        '200': { description: List of user bookings }
+        '200':
+          description: List of user bookings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserBookingsResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
 
-  /events/{id}/attendance:
+  /events:
+    get:
+      summary: List upcoming events
+      tags:
+        - Events
+      responses:
+        '200':
+          description: List of upcoming events
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventsResponse'
+
     post:
-      summary: Record attendance via booking code
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema: { type: integer }
+      summary: Create a new event
+      tags:
+        - Events
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                code: { type: string, example: 'EVT-A3F90C2B' }
+              $ref: '#/components/schemas/EventInput'
       responses:
-        '200': { description: Entry recorded with ticket count }
-        '404': { description: Code not found }
+        '201':
+          description: Event created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventResponse'
+        '422':
+          $ref: '#/components/responses/ValidationError'
 
-components:
-  schemas:
-    Event:
-      type: object
-      properties:
-        id: { type: integer }
-        title: { type: string }
-        date: { type: string, format: date-time }
-        total_capacity: { type: integer }
-        remaining_tickets: { type: integer }
-    CreateEvent:
-      type: object
-      required: [title, date, capacity]
-      properties:
-        title: { type: string }
-        date: { type: string, format: date-time }
-        capacity: { type: integer, minimum: 1 }
+  /events/{id}/attendance:
+    post:
+      summary: Record attendance for an event
+      tags:
+        - Events
+      parameters:
+        - $ref: '#/components/parameters/eventId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AttendanceInput'
+      responses:
+        '200':
+          description: Attendance recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttendanceResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /bookings:
+    post:
+      summary: Create a new booking
+      tags:
+        - Bookings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingInput'
+      responses:
+        '201':
+          description: Booking created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /bookings/code/{code}:
+    get:
+      summary: Get booking details by code
+      tags:
+        - Bookings
+      parameters:
+        - $ref: '#/components/parameters/bookingCode'
+      responses:
+        '200':
+          description: Booking details retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingByCodeResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'

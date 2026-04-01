@@ -7,12 +7,9 @@ export const createBooking = async ({ userId, eventId }) => {
 
   try {
     await conn.beginTransaction();
-
-    // Verify user exists
     const [[user]] = await conn.query('SELECT id FROM users WHERE id = ?', [userId]);
     if (!user) throw new AppError('User not found', 404);
 
-    // Lock the event row to prevent race condition
     const [[event]] = await conn.query(
       'SELECT id, remaining_tickets FROM events WHERE id = ? FOR UPDATE',
       [eventId]
@@ -35,12 +32,11 @@ export const createBooking = async ({ userId, eventId }) => {
     ]);
 
     const [result] = await conn.query(
-      'INSERT INTO bookings (user_id, event_id, code) VALUES (?, ?, ?)',
+      'INSERT INTO bookings (user_id, event_id, booking_code) VALUES (?, ?, ?)',
       [userId, eventId, code]
     );
 
     await conn.commit();
-
     return {
       bookingId: result.insertId,
       userId,
@@ -57,13 +53,13 @@ export const createBooking = async ({ userId, eventId }) => {
 
 export const getBookingByCode = async (code) => {
   const [[booking]] = await pool.query(
-    `SELECT b.id, b.code, b.booking_date,
+    `SELECT b.id, b.booking_code AS code, b.booking_date,
             u.id AS userId, u.name, u.email,
             e.id AS eventId, e.title, e.date
      FROM bookings b
      JOIN users  u ON u.id = b.user_id
      JOIN events e ON e.id = b.event_id
-     WHERE b.code = ?`,
+     WHERE b.booking_code = ?`,
     [code]
   );
 
