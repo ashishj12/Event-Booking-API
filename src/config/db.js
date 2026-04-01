@@ -10,20 +10,36 @@ const pool = mysql.createPool({
   waitForConnections: true,
 });
 
+// to handle the case when the app starts before the DB is ready, we can add a retry mechanism.
 export async function initDB() {
-  const schema = readFileSync('./src/schema/schema.sql', 'utf8');
-  const statements = schema
-    .split('\n')
-    .filter((line) => !line.trim().startsWith('--') && line.trim() !== '')
-    .join('\n')
-    .split(';')
-    .map((s) => s.trim())
-    .filter((s) => s.length > 0);
+  const maxRetries = 10;
+  const delay = (ms) => new Promise((res) => setTimeout(res, ms));
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const schema = readFileSync('./src/schema/schema.sql', 'utf8');
+      const statements = schema
+        .split('\n')
+        .filter((line) => !line.trim().startsWith('--') && line.trim() !== '')
+        .join('\n')
+        .split(';')
+        .map((s) => s.trim())
+        .filter((s) => s.length > 0);
 
-  for (const statement of statements) {
-    await pool.query(statement);
+      for (const statement of statements) {
+        await pool.query(statement);
+      }
+
+      console.log('Database schema initialized');
+      return;
+    } catch (err) {
+      if (err.code === 'ECONNREFUSED' && attempt < maxRetries) {
+        console.log(`DB not ready, retrying in 3s... (attempt ${attempt}/${maxRetries})`);
+        await delay(3000);
+      } else {
+        throw err;
+      }
+    }
   }
-  console.log('Database schema initialized');
 }
 
 export default pool;

@@ -33,7 +33,14 @@ git clone https://github.com/ashishj12/Event-Booking-API.git
 cd Event-Booking-API
 ```
 
-**2. Create your environment file**
+### Note
+
+create two .env file one for docker and another for local development, in docker .env file we need to change the database host to `db` because in docker compose we define the service name as `db` and in local development we can keep it as `localhost`.
+
+```bash
+cp .env.example .env.local
+
+**2. Create your environment file for Docker**
 
 ```bash
 cp .env.example .env
