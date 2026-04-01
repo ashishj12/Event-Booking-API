@@ -1,20 +1,14 @@
 import { Router } from 'express';
 import { validate } from '../middlewares/validate.js';
-import { createEventSchema, attendanceSchema } from '../validations/event.validation.js';
-import * as eventCtrl from '../controllers/eventController.js';
+import { createEventSchema, attendanceSchema } from '../utils/validation.js';
+import * as eventCtrl from '../controllers/event.controller.js';
 
 const router = Router();
 
 router.get('/', eventCtrl.listEvents);
 
-router.post('/',
-  validate(createEventSchema),
-  eventCtrl.createEvent
-);
+router.post('/', validate(createEventSchema), eventCtrl.createEvent);
 
-router.post('/:id/attendance',
-  validate(attendanceSchema),
-  eventCtrl.recordAttendance
-);
+router.post('/:id/attendance', validate(attendanceSchema), eventCtrl.recordAttendance);
 
 export default router;

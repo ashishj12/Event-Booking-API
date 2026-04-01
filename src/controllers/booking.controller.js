@@ -1,4 +1,4 @@
-import * as bookingService from '../services/bookingService.js';
+import * as bookingService from '../services/booking.service.js';
 
 export const book = async (req, res, next) => {
   try {
@@ -6,6 +6,6 @@ export const book = async (req, res, next) => {
     const result = await bookingService.createBooking({ userId, eventId });
     res.status(201).json({ success: true, data: result });
   } catch (err) {
-    next(err); // passes to global error handler
+    next(err);
   }
 };

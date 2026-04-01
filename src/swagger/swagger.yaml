@@ -40,7 +40,7 @@ paths:
             schema:
               type: object
               properties:
-                userId:  { type: integer }
+                userId: { type: integer }
                 eventId: { type: integer }
       responses:
         '201':
@@ -74,7 +74,7 @@ paths:
             schema:
               type: object
               properties:
-                code: { type: string, example: "EVT-A3F90C2B" }
+                code: { type: string, example: 'EVT-A3F90C2B' }
       responses:
         '200': { description: Entry recorded with ticket count }
         '404': { description: Code not found }
@@ -84,15 +84,15 @@ components:
     Event:
       type: object
       properties:
-        id:                { type: integer }
-        title:             { type: string }
-        date:              { type: string, format: date-time }
-        total_capacity:    { type: integer }
+        id: { type: integer }
+        title: { type: string }
+        date: { type: string, format: date-time }
+        total_capacity: { type: integer }
         remaining_tickets: { type: integer }
     CreateEvent:
       type: object
       required: [title, date, capacity]
       properties:
-        title:    { type: string }
-        date:     { type: string, format: date-time }
+        title: { type: string }
+        date: { type: string, format: date-time }
         capacity: { type: integer, minimum: 1 }

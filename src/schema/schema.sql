@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS users(
     name VARCHAR(100) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-)
+);
 
 -- Events table
 CREATE TABLE IF NOT EXISTS events (
@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS events (
   remaining_tickets INT UNSIGNED NOT NULL,
   created_at        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT chk_remaining CHECK (remaining_tickets <= total_capacity)
-)
+);
 
 -- Bookings table
 CREATE TABLE IF NOT EXISTS bookings (
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS bookings (
   booking_code VARCHAR(64) NOT NULL UNIQUE,
   CONSTRAINT fk_booking_user  FOREIGN KEY (user_id)  REFERENCES users(id)  ON DELETE CASCADE,
   CONSTRAINT fk_booking_event FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE
-)
+);
 
 -- Event Attendance table
 CREATE TABLE IF NOT EXISTS event_attendance (
@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS event_attendance (
   entry_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_attendance_user  FOREIGN KEY (user_id)  REFERENCES users(id)  ON DELETE CASCADE,
   CONSTRAINT fk_attendance_event FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE
-)
+);
 
 
 

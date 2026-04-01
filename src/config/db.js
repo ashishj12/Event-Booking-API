@@ -1,4 +1,5 @@
-import mysql from "mysql2/promise";
+import mysql from 'mysql2/promise';
+import { readFileSync } from 'node:fs';
 
 const pool = mysql.createPool({
   host: process.env.DB_HOST,
@@ -8,5 +9,21 @@ const pool = mysql.createPool({
   port: process.env.DB_PORT,
   waitForConnections: true,
 });
+
+export async function initDB() {
+  const schema = readFileSync('./src/schema/schema.sql', 'utf8');
+  const statements = schema
+    .split('\n')
+    .filter((line) => !line.trim().startsWith('--') && line.trim() !== '')
+    .join('\n')
+    .split(';')
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0);
+
+  for (const statement of statements) {
+    await pool.query(statement);
+  }
+  console.log('Database schema initialized');
+}
 
 export default pool;

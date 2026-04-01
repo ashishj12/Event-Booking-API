@@ -1,10 +1,27 @@
-import { validationResult } from "express-validator";
 
-// Runs after your validation chains, sends 422 if anything failed
-export const validate = (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(422).json({ success: false, errors: errors.array() });
-  }
-  next();
+export const validate = (schema) => {
+  return (req, res, next) => {
+    // Gather all parts of request that might be validated
+    const dataToValidate = {
+      body: req.body,
+      params: req.params,
+      query: req.query,
+    };
+
+    const result = schema.safeParse(dataToValidate);
+
+    if (!result.success) {
+      return res.status(422).json({
+        success: false,
+        errors: result.error.errors,
+      });
+    }
+
+    // Overwrite req objects with parsed/sanitized data
+    if (result.data.body) req.body = result.data.body;
+    if (result.data.params) req.params = result.data.params;
+    if (result.data.query) req.query = result.data.query;
+
+    next();
+  };
 };

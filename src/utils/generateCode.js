@@ -1,6 +1,6 @@
-import { randomBytes } from "node:crypto"; // node: prefix = modern best practice
+import { randomBytes } from 'node:crypto'; 
 
 export const generateCode = () => {
-  const rand = randomBytes(4).toString("hex").toUpperCase(); // e.g. "A3F90C2B"
+  const rand = randomBytes(4).toString('hex').toUpperCase();
   return `EVT-${rand}`;
 };

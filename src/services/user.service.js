@@ -22,15 +22,10 @@ export const getUserBookings = async (userId) => {
 };
 
 export const createUser = async ({ name, email }) => {
-  const [[existing]] = await pool.query(
-    'SELECT id FROM users WHERE email = ?', [email]
-  );
+  const [[existing]] = await pool.query('SELECT id FROM users WHERE email = ?', [email]);
   if (existing) throw new AppError('Email already registered', 409);
 
-  const [result] = await pool.query(
-    'INSERT INTO users (name, email) VALUES (?, ?)',
-    [name, email]
-  );
+  const [result] = await pool.query('INSERT INTO users (name, email) VALUES (?, ?)', [name, email]);
 
   return { id: result.insertId, name, email };
 };

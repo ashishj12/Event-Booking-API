@@ -1,4 +1,4 @@
-import * as eventService from '../services/eventService.js';
+import * as eventService from '../services/event.service.js';
 
 export const listEvents = async (req, res, next) => {
   try {
